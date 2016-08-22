@@ -30,13 +30,19 @@ public class SwipeView extends FrameLayout {
     private float backY;
     private float backW;
     private boolean notAnimating = true;
+    private boolean swiped;
     private float yTranslation = 0.125f;
+    private float xyScaleFront = 1.0f;
     private float xyScaleMid = 0.90f;
     private float xyScaleBack = 0.80f;
 
     private ArrayList<View> viewsArray = new ArrayList<>();
     private ArrayList<Float> viewsArrayY = new ArrayList<>();
     private ArrayList<Float> viewsArrayW = new ArrayList<>();
+    private ArrayList<Float> viewsXyScale = new ArrayList<>();
+
+    private float RIGHT_PERCENT_THRESHOLD = 0.3f;
+    private float LEFT_PERCENT_THRESHOLD = 0.7f;
 
     View frontView;
     View midView;
@@ -75,7 +81,7 @@ public class SwipeView extends FrameLayout {
 
         int childCount = binding.mainContainer.getChildCount();
 
-        for (int i = 0; i < childCount; i++){
+        for (int i = 0; i < childCount; i++) {
 
             viewsArray.add(binding.mainContainer.getChildAt(i));
         }
@@ -91,6 +97,10 @@ public class SwipeView extends FrameLayout {
 
     private void initViews() {
 
+        viewsXyScale.add(xyScaleFront);
+        viewsXyScale.add(xyScaleMid);
+        viewsXyScale.add(xyScaleBack);
+
         frontView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -102,7 +112,7 @@ public class SwipeView extends FrameLayout {
                 midView.setY(midView.getY() - midView.getHeight() * yTranslation);
                 midView.setScaleX(xyScaleMid);
                 midView.setScaleY(xyScaleMid);
-                midView.setZ(9);
+                midView.setZ(12);
 
                 midY = midView.getY();
                 midW = midView.getWidth() * xyScaleMid;
@@ -134,19 +144,64 @@ public class SwipeView extends FrameLayout {
             public void onAnimationStart(Animator animation) {
 
                 notAnimating = false;
+
+                if (swiped) {
+
+                    int size = viewsArray.size();
+
+                    for (int i = 0; i < size; i++) {
+
+                        viewsArray.get(i).setOnTouchListener(null);
+                    }
+                }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
 
                 notAnimating = true;
+
+                if (swiped) {
+
+                    swiped = false;
+
+                    moveToBack(viewsArray.get(0));
+                    sortViews();
+                    initSwipeListener();
+                }
             }
         };
     }
 
+    private void moveToBack(View view) {
+
+        view.setX(frontX);
+        view.setY(viewsArrayY.get(2));
+        view.setScaleX(xyScaleBack);
+        view.setScaleY(xyScaleBack);
+        view.setZ(6);
+        view.animate()
+                .alpha(1f)
+                .setDuration(450);
+    }
+
+    private void sortViews() {
+
+        View tempView = viewsArray.get(0);
+
+        int size = viewsArray.size();
+
+        for (int i = 0; i < size - 1; i++) {
+
+            viewsArray.set(i, viewsArray.get(i + 1));
+        }
+
+        viewsArray.set(size - 1, tempView);
+    }
+
     private void initSwipeListener() {
 
-        frontView.setOnTouchListener(new OnTouchListener() {
+        viewsArray.get(0).setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
 
@@ -218,7 +273,7 @@ public class SwipeView extends FrameLayout {
         float dw;
         float y;
 
-        float percent1;
+        float newPercent;
 
         percent = (1 - percent);
 
@@ -226,31 +281,19 @@ public class SwipeView extends FrameLayout {
 
             int size = viewsArray.size();
 
-            for (int i = 0; i < size - 2; i++) {
+            for (int i = 0; i < size - 1; i++) {
 
                 dY = viewsArrayY.get(i) - viewsArrayY.get(i + 1);
                 dw = viewsArrayW.get(i) - viewsArrayW.get(i + 1);
                 y = viewsArrayY.get(i + 1) + dY * percent;
 
-                midView.setY(y);
+                viewsArray.get(i + 1).setY(y);
 
-                percent1 = (viewsArrayW.get(i + 1) + dw * percent) / viewsArrayW.get(0);
+                newPercent = (viewsArrayW.get(i + 1) + dw * percent) / viewsArrayW.get(0);
 
-                Log.d("Test", "percent: " + percent1);
-                midView.setScaleX(percent1);
-                midView.setScaleY(percent1);
+                viewsArray.get(i + 1).setScaleX(newPercent);
+                viewsArray.get(i + 1).setScaleY(newPercent);
             }
-
-            float dY2 = midY - backY;
-            float dw2 = midW - backW;
-            float y2 = backY + dY2 * percent;
-
-            backView.setY(y2);
-
-            float percent2 = (backW + dw2 * percent) / frontW;
-
-            backView.setScaleX(percent2);
-            backView.setScaleY(percent2);
         }
     }
 
@@ -264,34 +307,33 @@ public class SwipeView extends FrameLayout {
 
         int animDuration = (int) ((view.getX() > 0 ? getRootView().getRight() - view.getX() : view.getRight()) / velocity);
 
-        if (view.getX() > getRootView().getRight() / 2 || view.getX() + view.getWidth() < getRootView().getRight() / 2) {
+        if (view.getX() > getRootView().getRight() * RIGHT_PERCENT_THRESHOLD || view.getX() + view.getWidth() < getRootView().getRight() * LEFT_PERCENT_THRESHOLD) {
 
-            view.animate()
+            swiped = true;
+
+            viewsArray.get(0).animate()
                     .x((view.getX() < 0 ? -1 : 1) * getRootView().getRight())
                     .alpha(0)
                     .setDuration(animDuration > 300 ? 300 : animDuration)
                     .setListener(moveListener)
                     .start();
 
-            midView.animate()
-                    .y(frontY)
-                    .scaleY(1)
-                    .scaleX(1)
-                    .z(18)
-                    .setDuration(400)
-                    .setInterpolator(new OvershootInterpolator());
+            int size = viewsArray.size();
 
-            backView.animate()
-                    .y(midY)
-                    .scaleY(xyScaleMid)
-                    .scaleX(xyScaleMid)
-                    .z(9)
-                    .setDuration(400)
-                    .setInterpolator(new OvershootInterpolator());
+            for (int i = 0; i < size - 1; i++) {
+
+                viewsArray.get(i + 1).animate()
+                        .y(viewsArrayY.get(i))
+                        .scaleY(viewsXyScale.get(i))
+                        .scaleX(viewsXyScale.get(i))
+                        .z(6 * (size - i))
+                        .setDuration(400)
+                        .setInterpolator(new OvershootInterpolator());
+            }
 
         } else {
 
-            view.animate()
+            viewsArray.get(0).animate()
                     .x(frontX)
                     .alpha(1)
                     .setDuration(400)
@@ -299,19 +341,17 @@ public class SwipeView extends FrameLayout {
                     .setListener(moveListener)
                     .start();
 
-            midView.animate()
-                    .y(midY)
-                    .scaleY(xyScaleMid)
-                    .scaleX(xyScaleMid)
-                    .setDuration(400)
-                    .setInterpolator(new OvershootInterpolator());
+            int size = viewsArray.size();
 
-            backView.animate()
-                    .y(backY)
-                    .scaleY(xyScaleBack)
-                    .scaleX(xyScaleBack)
-                    .setDuration(400)
-                    .setInterpolator(new OvershootInterpolator());
+            for (int i = 0; i < size - 1; i++) {
+
+                viewsArray.get(i + 1).animate()
+                        .y(viewsArrayY.get(i + 1))
+                        .scaleY(viewsXyScale.get(i + 1))
+                        .scaleX(viewsXyScale.get(i + 1))
+                        .setDuration(400)
+                        .setInterpolator(new OvershootInterpolator());
+            }
         }
     }
 }
