@@ -15,19 +15,32 @@ import android.widget.FrameLayout;
 
 import com.bootleg.swipetest.test.swipetest.databinding.ViewSwipeLayoutBinding;
 
+import java.util.ArrayList;
+
 public class SwipeView extends FrameLayout {
 
     private Context context;
     private ViewSwipeLayoutBinding binding;
     private float dX;
-    private float x1;
-    private float y1;
-    private float w1;
-    private float y1Mid;
-    private float w1Mid;
+    private float frontX;
+    private float frontY;
+    private float frontW;
+    private float midY;
+    private float midW;
+    private float backY;
+    private float backW;
     private boolean notAnimating = true;
-    private float yTranslationScale = 0.125f;
-    private float xyScale = 0.90f;
+    private float yTranslation = 0.125f;
+    private float xyScaleMid = 0.90f;
+    private float xyScaleBack = 0.80f;
+
+    private ArrayList<View> viewsArray = new ArrayList<>();
+    private ArrayList<Float> viewsArrayY = new ArrayList<>();
+    private ArrayList<Float> viewsArrayW = new ArrayList<>();
+
+    View frontView;
+    View midView;
+    View backView;
 
     AnimatorListenerAdapter moveListener;
 
@@ -60,7 +73,16 @@ public class SwipeView extends FrameLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         binding = ViewSwipeLayoutBinding.inflate(inflater, this, true);
 
+        int childCount = binding.mainContainer.getChildCount();
 
+        for (int i = 0; i < childCount; i++){
+
+            viewsArray.add(binding.mainContainer.getChildAt(i));
+        }
+
+        frontView = viewsArray.get(0);
+        midView = viewsArray.get(1);
+        backView = viewsArray.get(2);
 
         initViews();
         initMoveListener();
@@ -69,19 +91,37 @@ public class SwipeView extends FrameLayout {
 
     private void initViews() {
 
-        binding.containerMid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        frontView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
 
-                binding.containerMid.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                frontView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                binding.containerMid.setY(binding.containerMid.getY() - binding.containerMid.getHeight() * yTranslationScale);
-                binding.containerMid.setScaleX(xyScale);
-                binding.containerMid.setScaleY(xyScale);
-                binding.containerMid.setZ(xyScale);
+                frontView.setZ(18);
 
-                y1Mid = binding.containerMid.getY();
-                w1Mid = binding.containerMid.getWidth() * xyScale;
+                midView.setY(midView.getY() - midView.getHeight() * yTranslation);
+                midView.setScaleX(xyScaleMid);
+                midView.setScaleY(xyScaleMid);
+                midView.setZ(9);
+
+                midY = midView.getY();
+                midW = midView.getWidth() * xyScaleMid;
+
+                backView.setY(backView.getY() - backView.getHeight() * yTranslation * 1.9f);
+                backView.setScaleX(xyScaleBack);
+                backView.setScaleY(xyScaleBack);
+                backView.setZ(6);
+
+                backY = backView.getY();
+                backW = backView.getWidth() * xyScaleBack;
+
+                viewsArrayY.add(frontView.getY());
+                viewsArrayY.add(midView.getY());
+                viewsArrayY.add(backView.getY());
+
+                viewsArrayW.add(frontView.getWidth() * 1f);
+                viewsArrayW.add(midView.getWidth() * xyScaleMid);
+                viewsArrayW.add(backView.getWidth() * xyScaleBack);
             }
         });
     }
@@ -106,7 +146,7 @@ public class SwipeView extends FrameLayout {
 
     private void initSwipeListener() {
 
-        binding.containerFront.setOnTouchListener(new OnTouchListener() {
+        frontView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
 
@@ -116,11 +156,11 @@ public class SwipeView extends FrameLayout {
 
                         if (notAnimating) {
 
-                            x1 = view.getX();
-                            y1 = view.getY();
-                            w1 = view.getWidth();
+                            frontX = view.getX();
+                            frontY = view.getY();
+                            frontW = view.getWidth();
 
-                            dX = x1 - event.getRawX();
+                            dX = frontX - event.getRawX();
                         }
 
                         break;
@@ -129,7 +169,7 @@ public class SwipeView extends FrameLayout {
 
                         view.setX(event.getRawX() + dX);
 
-                        moveMidView(setViewAlpha(view));
+                        moveViews(setViewAlpha(view));
 
                         break;
 
@@ -172,25 +212,45 @@ public class SwipeView extends FrameLayout {
         return alpha;
     }
 
-    private void moveMidView(float percent) {
+    private void moveViews(float percent) {
+
+        float dY;
+        float dw;
+        float y;
+
+        float percent1;
 
         percent = (1 - percent);
 
         if (percent < 1) {
 
-            float dY = y1 - y1Mid;
-            float dw = w1 - w1Mid;
+            int size = viewsArray.size();
 
-            float y = y1Mid + dY * percent;
+            for (int i = 0; i < size - 2; i++) {
 
-            Log.d("Test", "distance: " + dY + percent + " y: " + y);
+                dY = viewsArrayY.get(i) - viewsArrayY.get(i + 1);
+                dw = viewsArrayW.get(i) - viewsArrayW.get(i + 1);
+                y = viewsArrayY.get(i + 1) + dY * percent;
 
-            binding.containerMid.setY(y);
+                midView.setY(y);
 
-            percent = (w1Mid + dw * percent) / w1;
+                percent1 = (viewsArrayW.get(i + 1) + dw * percent) / viewsArrayW.get(0);
 
-            binding.containerMid.setScaleX(percent);
-            binding.containerMid.setScaleY(percent);
+                Log.d("Test", "percent: " + percent1);
+                midView.setScaleX(percent1);
+                midView.setScaleY(percent1);
+            }
+
+            float dY2 = midY - backY;
+            float dw2 = midW - backW;
+            float y2 = backY + dY2 * percent;
+
+            backView.setY(y2);
+
+            float percent2 = (backW + dw2 * percent) / frontW;
+
+            backView.setScaleX(percent2);
+            backView.setScaleY(percent2);
         }
     }
 
@@ -198,7 +258,7 @@ public class SwipeView extends FrameLayout {
 
         float time = SystemClock.elapsedRealtime() - event.getDownTime();
 
-        float distance = view.getX() < 0 ? Math.abs(view.getX()) + x1 : view.getX() - x1;
+        float distance = view.getX() < 0 ? Math.abs(view.getX()) + frontX : view.getX() - frontX;
 
         float velocity = distance / time;
 
@@ -213,27 +273,43 @@ public class SwipeView extends FrameLayout {
                     .setListener(moveListener)
                     .start();
 
-            binding.containerMid.animate()
-                    .y(y1)
+            midView.animate()
+                    .y(frontY)
                     .scaleY(1)
                     .scaleX(1)
+                    .z(18)
+                    .setDuration(400)
+                    .setInterpolator(new OvershootInterpolator());
+
+            backView.animate()
+                    .y(midY)
+                    .scaleY(xyScaleMid)
+                    .scaleX(xyScaleMid)
+                    .z(9)
                     .setDuration(400)
                     .setInterpolator(new OvershootInterpolator());
 
         } else {
 
             view.animate()
-                    .x(x1)
+                    .x(frontX)
                     .alpha(1)
                     .setDuration(400)
                     .setInterpolator(new OvershootInterpolator())
                     .setListener(moveListener)
                     .start();
 
-            binding.containerMid.animate()
-                    .y(y1Mid)
-                    .scaleY(xyScale)
-                    .scaleX(xyScale)
+            midView.animate()
+                    .y(midY)
+                    .scaleY(xyScaleMid)
+                    .scaleX(xyScaleMid)
+                    .setDuration(400)
+                    .setInterpolator(new OvershootInterpolator());
+
+            backView.animate()
+                    .y(backY)
+                    .scaleY(xyScaleBack)
+                    .scaleX(xyScaleBack)
                     .setDuration(400)
                     .setInterpolator(new OvershootInterpolator());
         }

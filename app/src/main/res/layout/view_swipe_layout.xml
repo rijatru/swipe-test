@@ -7,6 +7,7 @@
     </data>
 
     <android.support.percent.PercentRelativeLayout
+        android:id="@+id/main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/grey"
@@ -26,6 +27,18 @@
 
         <FrameLayout
             android:id="@+id/container_mid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:layout_centerInParent="true"
+            android:elevation="@dimen/spacing_large"
+            android:layout_alignParentBottom="true"
+            app:layout_marginBottomPercent="5%"
+            app:layout_widthPercent="90%"
+            app:layout_heightPercent="70%" />
+
+        <FrameLayout
+            android:id="@+id/container_back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
