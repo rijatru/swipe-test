@@ -3,9 +3,7 @@ package com.bootleg.swipetest.test.swipetest.ui.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,8 +27,6 @@ public class SwipeView extends FrameLayout {
     private float midW;
     private float backY;
     private float backW;
-    private boolean notAnimating = true;
-    private boolean swiped;
     private float yTranslation = 0.125f;
     private float xyScaleFront = 1.0f;
     private float xyScaleMid = 0.90f;
@@ -44,11 +40,15 @@ public class SwipeView extends FrameLayout {
     private float RIGHT_PERCENT_THRESHOLD = 0.3f;
     private float LEFT_PERCENT_THRESHOLD = 0.7f;
 
+    private long t1;
+    private long t2;
+
     View frontView;
     View midView;
     View backView;
 
-    AnimatorListenerAdapter moveListener;
+    AnimatorListenerAdapter animationListener;
+    private boolean onAnimation;
 
     public SwipeView(Context context) {
         super(context);
@@ -138,54 +138,55 @@ public class SwipeView extends FrameLayout {
 
     private void initMoveListener() {
 
-        moveListener = new AnimatorListenerAdapter() {
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-                notAnimating = false;
-
-                if (swiped) {
-
-                    int size = viewsArray.size();
-
-                    for (int i = 0; i < size; i++) {
-
-                        viewsArray.get(i).setOnTouchListener(null);
-                    }
-                }
-            }
+        animationListener = new AnimatorListenerAdapter() {
 
             @Override
             public void onAnimationEnd(Animator animation) {
 
-                notAnimating = true;
+                if (onAnimation) {
 
-                if (swiped) {
+                    onAnimation = false;
 
-                    swiped = false;
+                    moveToBack(viewsArray.get(0), new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
 
-                    moveToBack(viewsArray.get(0));
-                    sortViews();
+                            viewsArray = sortViews(viewsArray);
+
+                            initSwipeListener();
+                        }
+                    });
+
+                } else {
+
                     initSwipeListener();
                 }
             }
         };
     }
 
-    private void moveToBack(View view) {
+    private void moveToBack(View view, final AnimatorListenerAdapter listener) {
 
         view.setX(frontX);
         view.setY(viewsArrayY.get(2));
         view.setScaleX(xyScaleBack);
         view.setScaleY(xyScaleBack);
         view.setZ(6);
+        view.setAlpha(0f);
         view.animate()
                 .alpha(1f)
-                .setDuration(450);
+                .setDuration(200)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                        listener.onAnimationEnd(null);
+                    }
+                })
+                .setInterpolator(null);
     }
 
-    private void sortViews() {
+    private ArrayList<View> sortViews(ArrayList<View> viewsArray) {
 
         View tempView = viewsArray.get(0);
 
@@ -197,6 +198,8 @@ public class SwipeView extends FrameLayout {
         }
 
         viewsArray.set(size - 1, tempView);
+
+        return viewsArray;
     }
 
     private void initSwipeListener() {
@@ -209,14 +212,13 @@ public class SwipeView extends FrameLayout {
 
                     case MotionEvent.ACTION_DOWN:
 
-                        if (notAnimating) {
+                        t1 = System.currentTimeMillis();
 
-                            frontX = view.getX();
-                            frontY = view.getY();
-                            frontW = view.getWidth();
+                        frontX = view.getX();
+                        frontY = view.getY();
+                        frontW = view.getWidth();
 
-                            dX = frontX - event.getRawX();
-                        }
+                        dX = frontX - event.getRawX();
 
                         break;
 
@@ -230,7 +232,9 @@ public class SwipeView extends FrameLayout {
 
                     case MotionEvent.ACTION_UP:
 
-                        setActionUp(view, event);
+                        t2 = System.currentTimeMillis();
+
+                        setActionUp(view);
 
                         break;
 
@@ -297,26 +301,31 @@ public class SwipeView extends FrameLayout {
         }
     }
 
-    private void setActionUp(View view, MotionEvent event) {
+    private void setActionUp(View view) {
 
-        float time = SystemClock.elapsedRealtime() - event.getDownTime();
+        float time = t2 - t1;
 
         float distance = view.getX() < 0 ? Math.abs(view.getX()) + frontX : view.getX() - frontX;
 
         float velocity = distance / time;
 
-        int animDuration = (int) ((view.getX() > 0 ? getRootView().getRight() - view.getX() : view.getRight()) / velocity);
+        float remainingDistance = view.getX() > 0 ? getRootView().getRight() - view.getX() : view.getWidth() - Math.abs(view.getX());
+
+        int animDuration = (int) (remainingDistance / velocity);
+
+        viewsArray.get(0).setOnTouchListener(null);
 
         if (view.getX() > getRootView().getRight() * RIGHT_PERCENT_THRESHOLD || view.getX() + view.getWidth() < getRootView().getRight() * LEFT_PERCENT_THRESHOLD) {
 
-            swiped = true;
+            onAnimation = true;
 
             viewsArray.get(0).animate()
-                    .x((view.getX() < 0 ? -1 : 1) * getRootView().getRight())
+                    .x((view.getX() < 0 ? -1 : 1) * getRootView().getWidth())
                     .alpha(0)
-                    .setDuration(animDuration > 300 ? 300 : animDuration)
-                    .setListener(moveListener)
-                    .start();
+                    .z(24)
+                    .setDuration(animDuration > 400 ? 400 : animDuration)
+                    .setListener(animationListener)
+                    .setInterpolator(null);
 
             int size = viewsArray.size();
 
@@ -328,6 +337,7 @@ public class SwipeView extends FrameLayout {
                         .scaleX(viewsXyScale.get(i))
                         .z(6 * (size - i))
                         .setDuration(400)
+                        .setListener(null)
                         .setInterpolator(new OvershootInterpolator());
             }
 
@@ -337,9 +347,8 @@ public class SwipeView extends FrameLayout {
                     .x(frontX)
                     .alpha(1)
                     .setDuration(400)
-                    .setInterpolator(new OvershootInterpolator())
-                    .setListener(moveListener)
-                    .start();
+                    .setListener(animationListener)
+                    .setInterpolator(new OvershootInterpolator());
 
             int size = viewsArray.size();
 
@@ -350,7 +359,8 @@ public class SwipeView extends FrameLayout {
                         .scaleY(viewsXyScale.get(i + 1))
                         .scaleX(viewsXyScale.get(i + 1))
                         .setDuration(400)
-                        .setInterpolator(new OvershootInterpolator());
+                        .setListener(null)
+                        .setInterpolator(null);
             }
         }
     }
