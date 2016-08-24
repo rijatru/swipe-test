@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.percent.PercentFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bootleg.swipetest.test.swipetest.MainActivity">
+    android:background="@drawable/bitmap">
 
-   <com.bootleg.swipetest.test.swipetest.ui.views.SwipeView
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"/>
+        <com.bootleg.swipetest.test.swipetest.ui.views.SwipeView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:layout_marginTopPercent="10%"
+            app:layout_heightPercent="60%"/>
 
-</RelativeLayout>
+    <ImageView
+        android:layout_gravity="center_horizontal|bottom"
+        app:layout_marginBottomPercent="10%"
+        app:layout_widthPercent="20%"
+        app:layout_aspectRatio="100%"
+        app:srcCompat="@drawable/ic_play" />
+
+</android.support.percent.PercentFrameLayout>
