@@ -19,18 +19,14 @@ public class SwipeView extends FrameLayout {
 
     private Context context;
     private ViewSwipeLayoutBinding binding;
+
     private float dX;
     private float frontX;
-    private float frontY;
-    private float frontW;
-    private float midY;
-    private float midW;
-    private float backY;
-    private float backW;
     private float yTranslation = 0.125f;
     private float xyScaleFront = 1.0f;
     private float xyScaleMid = 0.90f;
     private float xyScaleBack = 0.80f;
+    private float xyScaleLast = 0.70f;
 
     private ArrayList<View> viewsArray = new ArrayList<>();
     private ArrayList<Float> viewsArrayY = new ArrayList<>();
@@ -46,6 +42,7 @@ public class SwipeView extends FrameLayout {
     View frontView;
     View midView;
     View backView;
+    View lastView;
 
     AnimatorListenerAdapter animationListener;
     private boolean onAnimation;
@@ -89,6 +86,7 @@ public class SwipeView extends FrameLayout {
         frontView = viewsArray.get(0);
         midView = viewsArray.get(1);
         backView = viewsArray.get(2);
+        lastView = viewsArray.get(3);
 
         initViews();
         initMoveListener();
@@ -100,6 +98,7 @@ public class SwipeView extends FrameLayout {
         viewsXyScale.add(xyScaleFront);
         viewsXyScale.add(xyScaleMid);
         viewsXyScale.add(xyScaleBack);
+        viewsXyScale.add(xyScaleLast);
 
         frontView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -114,24 +113,25 @@ public class SwipeView extends FrameLayout {
                 midView.setScaleY(xyScaleMid);
                 midView.setZ(12);
 
-                midY = midView.getY();
-                midW = midView.getWidth() * xyScaleMid;
-
                 backView.setY(backView.getY() - backView.getHeight() * yTranslation * 1.9f);
                 backView.setScaleX(xyScaleBack);
                 backView.setScaleY(xyScaleBack);
                 backView.setZ(6);
 
-                backY = backView.getY();
-                backW = backView.getWidth() * xyScaleBack;
+                lastView.setY(lastView.getY() - lastView.getHeight() * yTranslation * 1.9f);
+                lastView.setScaleX(xyScaleBack);
+                lastView.setScaleY(xyScaleBack);
+                lastView.setZ(0);
 
                 viewsArrayY.add(frontView.getY());
                 viewsArrayY.add(midView.getY());
                 viewsArrayY.add(backView.getY());
+                viewsArrayY.add(lastView.getY());
 
                 viewsArrayW.add(frontView.getWidth() * 1f);
                 viewsArrayW.add(midView.getWidth() * xyScaleMid);
                 viewsArrayW.add(backView.getWidth() * xyScaleBack);
+                viewsArrayW.add(lastView.getWidth() * xyScaleLast);
             }
         });
     }
@@ -215,8 +215,6 @@ public class SwipeView extends FrameLayout {
                         t1 = System.currentTimeMillis();
 
                         frontX = view.getX();
-                        frontY = view.getY();
-                        frontW = view.getWidth();
 
                         dX = frontX - event.getRawX();
 
