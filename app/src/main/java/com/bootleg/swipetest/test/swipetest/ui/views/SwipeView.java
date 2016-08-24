@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 public class SwipeView extends FrameLayout {
 
+    private int STANDARD_ANIMATION_DURATION = 300;
+
     private Context context;
     private ViewSwipeLayoutBinding binding;
 
@@ -33,18 +35,14 @@ public class SwipeView extends FrameLayout {
     private ArrayList<Float> viewsArrayW = new ArrayList<>();
     private ArrayList<Float> viewsXyScale = new ArrayList<>();
 
-    private float RIGHT_PERCENT_THRESHOLD = 0.3f;
-    private float LEFT_PERCENT_THRESHOLD = 0.7f;
+    private float RIGHT_PERCENT_THRESHOLD = 0.5f;
+    private float LEFT_PERCENT_THRESHOLD = 0.5f;
+    private float VELOCITY_THRESHOLD = 1.4f;
 
     private long t1;
     private long t2;
 
     private int size;
-
-    View frontView;
-    View midView;
-    View backView;
-    View lastView;
 
     AnimatorListenerAdapter animationListener;
     private boolean onAnimation;
@@ -85,11 +83,6 @@ public class SwipeView extends FrameLayout {
             viewsArray.add(binding.mainContainer.getChildAt(i));
         }
 
-        frontView = viewsArray.get(0);
-        midView = viewsArray.get(1);
-        backView = viewsArray.get(2);
-        lastView = viewsArray.get(3);
-
         initViews();
         initMoveListener();
         initSwipeListener();
@@ -102,21 +95,21 @@ public class SwipeView extends FrameLayout {
         viewsXyScale.add(xyScaleBack);
         viewsXyScale.add(xyScaleLast);
 
-        frontView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        viewsArray.get(0).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
 
-                frontView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                viewsArray.get(0).getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                frontView.setZ(18);
-                viewsArrayY.add(frontView.getY());
-                viewsArrayW.add(frontView.getWidth() * xyScaleFront);
+                viewsArray.get(0).setZ(size * size);
+                viewsArrayY.add(viewsArray.get(0).getY());
+                viewsArrayW.add(viewsArray.get(0).getWidth() * xyScaleFront);
 
                 size = viewsArray.size();
 
                 for (int i = 1; i < size; i++) {
 
-                    float dX = i < 2 ? 1 : 1.9f;
+                    float dX = i < 2 ? 1 : 2;
 
                     float y = viewsArray.get(i).getY() - viewsArray.get(i).getHeight() * yTranslation * dX;
 
@@ -143,15 +136,11 @@ public class SwipeView extends FrameLayout {
 
                     onAnimation = false;
 
-                    moveToBack(viewsArray.get(0), new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
+                    moveToBack(viewsArray.get(0));
 
-                            viewsArray = sortViews(viewsArray);
+                    viewsArray = sortViews(viewsArray);
 
-                            initSwipeListener();
-                        }
-                    });
+                    initSwipeListener();
 
                 } else {
 
@@ -161,25 +150,14 @@ public class SwipeView extends FrameLayout {
         };
     }
 
-    private void moveToBack(View view, final AnimatorListenerAdapter listener) {
+    private void moveToBack(View view) {
 
         view.setX(frontX);
-        view.setY(viewsArrayY.get(2));
-        view.setScaleX(xyScaleBack);
-        view.setScaleY(xyScaleBack);
+        view.setY(viewsArrayY.get(size - 1));
+        view.setScaleX(xyScaleLast);
+        view.setScaleY(xyScaleLast);
         view.setZ(size);
-        view.setAlpha(0f);
-        view.animate()
-                .alpha(1f)
-                .setDuration(0)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-
-                        listener.onAnimationEnd(null);
-                    }
-                })
-                .setInterpolator(null);
+        view.setAlpha(1);
     }
 
     private ArrayList<View> sortViews(ArrayList<View> viewsArray) {
@@ -305,17 +283,17 @@ public class SwipeView extends FrameLayout {
 
         viewsArray.get(0).setOnTouchListener(null);
 
-        if (view.getX() > getRootView().getRight() * RIGHT_PERCENT_THRESHOLD ||
-                view.getX() + view.getWidth() < getRootView().getRight() * LEFT_PERCENT_THRESHOLD ||
-                Math.abs(velocity) > 1.4) {
+        if (view.getX() > getRootView().getRight() * RIGHT_PERCENT_THRESHOLD
+                || view.getX() + view.getWidth() < getRootView().getRight() * LEFT_PERCENT_THRESHOLD
+                || Math.abs(velocity) > VELOCITY_THRESHOLD) {
 
             onAnimation = true;
 
             viewsArray.get(0).animate()
                     .x((view.getX() < 0 ? -1 : 1) * getRootView().getWidth())
                     .alpha(0)
-                    .z(24)
-                    .setDuration(animDuration > 400 ? 400 : animDuration)
+                    .z(size * size)
+                    .setDuration(animDuration > STANDARD_ANIMATION_DURATION ? 30 : animDuration)
                     .setListener(animationListener)
                     .setInterpolator(null);
 
@@ -326,7 +304,7 @@ public class SwipeView extends FrameLayout {
                         .scaleY(viewsXyScale.get(i))
                         .scaleX(viewsXyScale.get(i))
                         .z(size * (size - i))
-                        .setDuration(animDuration > 400 ? 400 : animDuration)
+                        .setDuration(animDuration > STANDARD_ANIMATION_DURATION ? STANDARD_ANIMATION_DURATION : animDuration)
                         .setListener(null)
                         .setInterpolator(new OvershootInterpolator());
             }
@@ -336,7 +314,7 @@ public class SwipeView extends FrameLayout {
             viewsArray.get(0).animate()
                     .x(frontX)
                     .alpha(1)
-                    .setDuration(400)
+                    .setDuration(STANDARD_ANIMATION_DURATION)
                     .setListener(animationListener)
                     .setInterpolator(new OvershootInterpolator());
 
@@ -346,7 +324,7 @@ public class SwipeView extends FrameLayout {
                         .y(viewsArrayY.get(i + 1))
                         .scaleY(viewsXyScale.get(i + 1))
                         .scaleX(viewsXyScale.get(i + 1))
-                        .setDuration(400)
+                        .setDuration(STANDARD_ANIMATION_DURATION)
                         .setListener(null)
                         .setInterpolator(null);
             }
