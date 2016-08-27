@@ -3,6 +3,7 @@ package com.bootleg.swipetest.test.swipetest.ui.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,7 +16,7 @@ import com.bootleg.swipetest.test.swipetest.databinding.ViewSwipeLayoutBinding;
 
 import java.util.ArrayList;
 
-public class SwipeView extends FrameLayout {
+public class SwipeView extends ViewPager {
 
     private int STANDARD_ANIMATION_DURATION = 300;
 
@@ -55,13 +56,6 @@ public class SwipeView extends FrameLayout {
 
     public SwipeView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
-        initAttrs(attrs);
-        init();
-    }
-
-    public SwipeView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
         this.context = context;
         initAttrs(attrs);
         init();
