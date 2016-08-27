@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.bootleg.swipetest.test.swipetest.ui.views.viewmodels.SwipeViewFragmentViewModel" />
+    </data>
+
+    <android.support.percent.PercentFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bitmap">
+
+
+    </android.support.percent.PercentFrameLayout>
+
+</layout>
