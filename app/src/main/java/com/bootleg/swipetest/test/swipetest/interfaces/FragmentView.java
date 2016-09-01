@@ -12,22 +12,14 @@ import com.grability.base.ui.factories.SnackBarFactory;
 
 public abstract class FragmentView extends Fragment {
 
-    private int enter = R.anim.slide_in_right;
-
-    private int exit = R.anim.slide_out_right;
-
-    private int popEnter = R.anim.slide_in_right;
-
-    private int popExit = R.anim.slide_out_right;
-
-    private boolean addOnStack = false;
-
-    private boolean animate = false;
-
-    private int container = R.id.container;
-
     protected FragmentListener fragmentListener;
-
+    private int enter = R.anim.slide_in_right;
+    private int exit = R.anim.slide_out_right;
+    private int popEnter = R.anim.slide_in_right;
+    private int popExit = R.anim.slide_out_right;
+    private boolean addOnStack = false;
+    private boolean animate = false;
+    private int container = R.id.container;
     private ProgressDialog progressDialog;
 
     @Override
@@ -95,16 +87,36 @@ public abstract class FragmentView extends Fragment {
         return enter;
     }
 
+    public FragmentView setEnter(int enter) {
+        this.enter = enter;
+        return this;
+    }
+
     public int getExit() {
         return exit;
+    }
+
+    public FragmentView setExit(int exit) {
+        this.exit = exit;
+        return this;
     }
 
     public int getPopEnter() {
         return popEnter;
     }
 
+    public FragmentView setPopEnter(int popEnter) {
+        this.popEnter = popEnter;
+        return this;
+    }
+
     public int getPopExit() {
         return popExit;
+    }
+
+    public FragmentView setPopExit(int popExit) {
+        this.popExit = popExit;
+        return this;
     }
 
     public boolean isAddOnStack() {
@@ -117,26 +129,6 @@ public abstract class FragmentView extends Fragment {
 
     public int getContainer() {
         return container;
-    }
-
-    public FragmentView setEnter(int enter) {
-        this.enter = enter;
-        return this;
-    }
-
-    public FragmentView setExit(int exit) {
-        this.exit = exit;
-        return this;
-    }
-
-    public FragmentView setPopEnter(int popEnter) {
-        this.popEnter = popEnter;
-        return this;
-    }
-
-    public FragmentView setPopExit(int popExit) {
-        this.popExit = popExit;
-        return this;
     }
 
     public FragmentView addOnStack() {

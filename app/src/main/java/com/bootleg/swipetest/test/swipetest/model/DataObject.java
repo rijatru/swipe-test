@@ -1,8 +1,8 @@
 package com.bootleg.swipetest.test.swipetest.model;
 
-import com.grability.base.interfaces.GenericItem;
+import com.bootleg.swipetest.test.swipetest.interfaces.GenericObject;
 
-public class DataObject implements GenericItem{
+public class DataObject implements GenericObject {
 
     private int number;
 

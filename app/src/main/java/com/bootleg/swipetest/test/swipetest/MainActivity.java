@@ -8,13 +8,12 @@ import android.view.WindowManager;
 import com.bootleg.swipetest.test.swipetest.adapters.SwipeViewAdapter;
 import com.bootleg.swipetest.test.swipetest.databinding.ActivityMainBinding;
 import com.bootleg.swipetest.test.swipetest.factories.AdapterFactory;
+import com.bootleg.swipetest.test.swipetest.interfaces.GenericObject;
+import com.bootleg.swipetest.test.swipetest.interfaces.ItemView;
 import com.bootleg.swipetest.test.swipetest.model.DataObject;
 import com.bootleg.swipetest.test.swipetest.ui.activities.BaseFragmentActivity;
-import com.bootleg.swipetest.test.swipetest.ui.viewmodels.DataViewViewModel;
 import com.bootleg.swipetest.test.swipetest.ui.views.DataView;
 import com.bootleg.swipetest.test.swipetest.ui.views.SwipeView;
-import com.grability.base.interfaces.GenericItem;
-import com.grability.base.interfaces.GenericItemView;
 
 import java.util.ArrayList;
 
@@ -45,30 +44,33 @@ public class MainActivity extends BaseFragmentActivity {
 
         swipeViewAdapter = new SwipeViewAdapter(new AdapterFactory() {
             @Override
-            public GenericItemView onCreateView(GenericItem item) {
+            public ItemView onCreateView(GenericObject item) {
 
-                DataView view = new DataView (MainActivity.this);
+                DataView view = new DataView(MainActivity.this);
 
-                DataViewViewModel viewModel = new DataViewViewModel(item);
-
-                view.setViewModel(viewModel);
+                view.bind(item);
 
                 return view;
             }
         });
 
-        ArrayList<GenericItem> items = new ArrayList<>();
+        swipeViewAdapter.setItems(getMockObjects());
+
+        binding.swipeView.setAdapter(swipeViewAdapter);
+
+        binding.swipeView.setListener(swipeViewInterface);
+    }
+
+    private ArrayList<GenericObject> getMockObjects() {
+
+        ArrayList<GenericObject> items = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
 
             items.add(new DataObject(i));
         }
 
-        swipeViewAdapter.setItems(items);
-
-        binding.swipeView.setAdapter(swipeViewAdapter);
-
-        binding.swipeView.setListener(swipeViewInterface);
+        return items;
     }
 
     private void initListeners() {

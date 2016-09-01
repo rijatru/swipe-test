@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
 import com.bootleg.swipetest.test.swipetest.databinding.ViewDataBinding;
+import com.bootleg.swipetest.test.swipetest.interfaces.GenericObject;
+import com.bootleg.swipetest.test.swipetest.interfaces.ItemView;
 import com.bootleg.swipetest.test.swipetest.ui.viewmodels.DataViewViewModel;
-import com.grability.base.interfaces.GenericItem;
-import com.grability.base.interfaces.GenericItemView;
 
-public class DataView extends FrameLayout implements GenericItemView {
+public class DataView extends FrameLayout implements ItemView {
 
     private ViewDataBinding binding;
 
@@ -50,11 +50,14 @@ public class DataView extends FrameLayout implements GenericItemView {
     }
 
     @Override
-    public void bind(GenericItem item) {
+    public void bind(GenericObject item) {
 
+        DataViewViewModel viewModel = new DataViewViewModel(item);
+
+        setViewModel(viewModel);
     }
 
-    public void setViewModel(DataViewViewModel viewModel) {
+    private void setViewModel(DataViewViewModel viewModel) {
 
         this.viewModel = viewModel;
 

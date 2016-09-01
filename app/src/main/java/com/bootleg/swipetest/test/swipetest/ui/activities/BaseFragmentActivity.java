@@ -16,22 +16,18 @@ import java.util.ArrayList;
 public class BaseFragmentActivity extends AppCompatActivity implements FragmentListener {
 
     private ArrayList<FragmentView> pendingForClose = new ArrayList<>();
+    private ArrayList<FragmentView> pendingForOpen = new ArrayList<>();
+    private FragmentManager fragmentManager;
+    private ProgressDialog progressDialog;
+    private boolean pause = false;
 
     public ArrayList<FragmentView> getPendingForOpen() {
         return pendingForOpen;
     }
 
-    private ArrayList<FragmentView> pendingForOpen = new ArrayList<>();
-
     public FragmentManager getBaseFragmentManager() {
         return fragmentManager;
     }
-
-    private FragmentManager fragmentManager;
-
-    private ProgressDialog progressDialog;
-
-    private boolean pause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
