@@ -1,6 +1,6 @@
 package com.bootleg.swipeview.sample.models;
 
-import com.bootleg.swipeview.lib.interfaces.GenericObject;
+import com.bootleg.swipeview.interfaces.GenericObject;
 
 public class DataObject implements GenericObject {
 

@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/bitmap">
 
-        <com.bootleg.swipeview.lib.views.SwipeView
+        <com.bootleg.swipeview.views.SwipeView
             android:id="@+id/swipe_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

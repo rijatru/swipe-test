@@ -1,4 +1,4 @@
-package com.bootleg.swipeview.lib.views;
+package com.bootleg.swipeview.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -12,8 +12,8 @@ import android.view.ViewTreeObserver;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
-import com.bootleg.swipetest.test.swipetest.databinding.ViewSwipeLayoutBinding;
-import com.bootleg.swipeview.lib.adapters.SwipeViewAdapter;
+import com.bootleg.swipeview.adapters.SwipeViewAdapter;
+import com.bootleg.swipeview.databinding.ViewSwipeLayoutBinding;
 
 import java.util.ArrayList;
 

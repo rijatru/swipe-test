@@ -8,11 +8,11 @@ import android.view.WindowManager;
 
 import com.bootleg.swipetest.test.swipetest.R;
 import com.bootleg.swipetest.test.swipetest.databinding.ActivityMainBinding;
-import com.bootleg.swipeview.lib.adapters.SwipeViewAdapter;
-import com.bootleg.swipeview.lib.factories.AdapterFactory;
-import com.bootleg.swipeview.lib.interfaces.GenericObject;
-import com.bootleg.swipeview.lib.interfaces.ItemView;
-import com.bootleg.swipeview.lib.views.SwipeView;
+import com.bootleg.swipeview.adapters.SwipeViewAdapter;
+import com.bootleg.swipeview.factories.AdapterFactory;
+import com.bootleg.swipeview.interfaces.GenericObject;
+import com.bootleg.swipeview.interfaces.ItemView;
+import com.bootleg.swipeview.views.SwipeView;
 import com.bootleg.swipeview.sample.models.DataObject;
 import com.bootleg.swipeview.sample.ui.views.DataView;
 

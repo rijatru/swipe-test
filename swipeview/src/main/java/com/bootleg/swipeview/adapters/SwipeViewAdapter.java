@@ -1,8 +1,8 @@
-package com.bootleg.swipeview.lib.adapters;
+package com.bootleg.swipeview.adapters;
 
-import com.bootleg.swipeview.lib.factories.AdapterFactory;
-import com.bootleg.swipeview.lib.interfaces.GenericObject;
-import com.bootleg.swipeview.lib.interfaces.ItemView;
+import com.bootleg.swipeview.factories.AdapterFactory;
+import com.bootleg.swipeview.interfaces.GenericObject;
+import com.bootleg.swipeview.interfaces.ItemView;
 
 import java.util.ArrayList;
 

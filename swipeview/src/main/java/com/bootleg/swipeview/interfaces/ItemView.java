@@ -1,4 +1,4 @@
-package com.bootleg.swipeview.lib.interfaces;
+package com.bootleg.swipeview.interfaces;
 
 public interface ItemView {
 

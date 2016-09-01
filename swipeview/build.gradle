@@ -1,21 +1,15 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
-    dexOptions{
-        maxProcessCount = 4
-        javaMaxHeapSize "2g"
-    }
 
     defaultConfig {
-        applicationId "com.bootleg.swipetest.test.swipetest"
         minSdkVersion 21
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -30,7 +24,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':swipeview')
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:percent:24.2.0'
 }

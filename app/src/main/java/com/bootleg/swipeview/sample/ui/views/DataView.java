@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
 import com.bootleg.swipetest.test.swipetest.databinding.ViewDataBinding;
-import com.bootleg.swipeview.lib.interfaces.GenericObject;
-import com.bootleg.swipeview.lib.interfaces.ItemView;
+import com.bootleg.swipeview.interfaces.GenericObject;
+import com.bootleg.swipeview.interfaces.ItemView;
 import com.bootleg.swipeview.sample.ui.viewmodels.DataViewViewModel;
 
 public class DataView extends FrameLayout implements ItemView {
