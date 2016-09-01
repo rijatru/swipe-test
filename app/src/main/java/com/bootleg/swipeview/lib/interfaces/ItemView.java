@@ -1,5 +1,4 @@
-package com.bootleg.swipetest.test.swipetest.interfaces;
-
+package com.bootleg.swipeview.lib.interfaces;
 
 public interface ItemView {
 

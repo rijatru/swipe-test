@@ -7,16 +7,12 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/../../../Grability/modules" />
-            <option value="$PROJECT_DIR$/../../../Grability/modules/base" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="myModules">
           <set>
-            <option value="$PROJECT_DIR$/../../../Grability/modules" />
-            <option value="$PROJECT_DIR$/../../../Grability/modules/base" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>

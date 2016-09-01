@@ -1,23 +1,24 @@
-package com.bootleg.swipetest.test.swipetest;
+package com.bootleg.swipeview.sample.ui.activities;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.bootleg.swipetest.test.swipetest.adapters.SwipeViewAdapter;
+import com.bootleg.swipetest.test.swipetest.R;
 import com.bootleg.swipetest.test.swipetest.databinding.ActivityMainBinding;
-import com.bootleg.swipetest.test.swipetest.factories.AdapterFactory;
-import com.bootleg.swipetest.test.swipetest.interfaces.GenericObject;
-import com.bootleg.swipetest.test.swipetest.interfaces.ItemView;
-import com.bootleg.swipetest.test.swipetest.model.DataObject;
-import com.bootleg.swipetest.test.swipetest.ui.activities.BaseFragmentActivity;
-import com.bootleg.swipetest.test.swipetest.ui.views.DataView;
-import com.bootleg.swipetest.test.swipetest.ui.views.SwipeView;
+import com.bootleg.swipeview.lib.adapters.SwipeViewAdapter;
+import com.bootleg.swipeview.lib.factories.AdapterFactory;
+import com.bootleg.swipeview.lib.interfaces.GenericObject;
+import com.bootleg.swipeview.lib.interfaces.ItemView;
+import com.bootleg.swipeview.lib.views.SwipeView;
+import com.bootleg.swipeview.sample.models.DataObject;
+import com.bootleg.swipeview.sample.ui.views.DataView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends BaseFragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
     private final String CURRENT_POSITION = "current_position";
 

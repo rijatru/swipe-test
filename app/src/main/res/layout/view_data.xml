@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.bootleg.swipetest.test.swipetest.ui.viewmodels.DataViewViewModel" />
+            type="com.bootleg.swipeview.sample.ui.viewmodels.DataViewViewModel" />
     </data>
 
     <android.support.percent.PercentFrameLayout
