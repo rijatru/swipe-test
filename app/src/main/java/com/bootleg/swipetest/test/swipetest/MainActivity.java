@@ -19,9 +19,12 @@ import java.util.ArrayList;
 
 public class MainActivity extends BaseFragmentActivity {
 
+    private final String CURRENT_POSITION = "current_position";
+
     private SwipeView.SwipeViewInterface swipeViewInterface;
     private ActivityMainBinding binding;
     private SwipeViewAdapter swipeViewAdapter;
+    private int currentPosition = -999;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +38,22 @@ public class MainActivity extends BaseFragmentActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        if (savedInstanceState != null) {
+
+            currentPosition = savedInstanceState.getInt(CURRENT_POSITION);
+        }
+
         initListeners();
 
         initAdapters();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putInt(CURRENT_POSITION, swipeViewAdapter.getCurrentPosition());
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     private void initAdapters() {
@@ -70,6 +86,13 @@ public class MainActivity extends BaseFragmentActivity {
             items.add(new DataObject(i));
         }
 
+        if (currentPosition > 0) {
+
+            swipeViewAdapter.setCurrentPosition(currentPosition);
+
+            items.subList(0, currentPosition).clear();
+        }
+
         return items;
     }
 
@@ -77,7 +100,7 @@ public class MainActivity extends BaseFragmentActivity {
 
         this.swipeViewInterface = new SwipeView.SwipeViewInterface() {
             @Override
-            public void onElementSwiped() {
+            public void onItemSwiped() {
 
 
             }

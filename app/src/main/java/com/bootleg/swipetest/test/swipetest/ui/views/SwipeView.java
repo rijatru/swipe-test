@@ -142,7 +142,14 @@ public class SwipeView extends FrameLayout {
 
                     onAnimation = false;
 
-                    moveToBack(viewsArray.get(0));
+                    if (adapter.hasMoreItems()) {
+
+                        viewsArray.get(0).addView((View) adapter.getNextView());
+
+                        moveToBack(viewsArray.get(0));
+                    }
+
+                    adapter.moveCurrentPosition();
 
                     viewsArray = sortViews(viewsArray);
 
@@ -315,6 +322,8 @@ public class SwipeView extends FrameLayout {
                         .setInterpolator(new OvershootInterpolator());
             }
 
+            listener.onItemSwiped();
+
         } else {
 
             viewsArray.get(0).animate()
@@ -346,6 +355,8 @@ public class SwipeView extends FrameLayout {
         for (int i = 0; i < size; i++) {
 
             viewsArray.get(i).addView((View) adapter.getView(i));
+
+            this.adapter.setNewIndex(i);
         }
     }
 
@@ -355,6 +366,6 @@ public class SwipeView extends FrameLayout {
 
     public interface SwipeViewInterface {
 
-        void onElementSwiped();
+        void onItemSwiped();
     }
 }
