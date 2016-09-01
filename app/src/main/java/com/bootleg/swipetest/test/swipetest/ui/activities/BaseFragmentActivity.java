@@ -1,4 +1,4 @@
-package com.bootleg.swipetest.test.swipetest.ui.views.activities;
+package com.bootleg.swipetest.test.swipetest.ui.activities;
 
 
 import android.app.ProgressDialog;

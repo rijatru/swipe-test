@@ -3,20 +3,21 @@ package com.bootleg.swipetest.test.swipetest.ui.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
+import com.bootleg.swipetest.test.swipetest.adapters.SwipeViewAdapter;
 import com.bootleg.swipetest.test.swipetest.databinding.ViewSwipeLayoutBinding;
 
 import java.util.ArrayList;
 
-public class SwipeView extends ViewPager {
+public class SwipeView extends FrameLayout {
 
     private int STANDARD_ANIMATION_DURATION = 300;
 
@@ -31,7 +32,7 @@ public class SwipeView extends ViewPager {
     private float xyScaleBack = 0.80f;
     private float xyScaleLast = 0.70f;
 
-    private ArrayList<View> viewsArray = new ArrayList<>();
+    private ArrayList<ViewGroup> viewsArray = new ArrayList<>();
     private ArrayList<Float> viewsArrayY = new ArrayList<>();
     private ArrayList<Float> viewsArrayW = new ArrayList<>();
     private ArrayList<Float> viewsXyScale = new ArrayList<>();
@@ -45,7 +46,10 @@ public class SwipeView extends ViewPager {
 
     private int size;
 
-    AnimatorListenerAdapter animationListener;
+    private SwipeViewAdapter adapter;
+
+    private SwipeViewInterface listener;
+    private AnimatorListenerAdapter animationListener;
     private boolean onAnimation;
 
     public SwipeView(Context context) {
@@ -61,6 +65,13 @@ public class SwipeView extends ViewPager {
         init();
     }
 
+    public SwipeView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        this.context = context;
+        initAttrs(attrs);
+        init();
+    }
+
     private void initAttrs(AttributeSet attrs) {
 
     }
@@ -68,13 +79,14 @@ public class SwipeView extends ViewPager {
     private void init() {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         binding = ViewSwipeLayoutBinding.inflate(inflater, this, true);
 
         size = binding.mainContainer.getChildCount();
 
         for (int i = 0; i < size; i++) {
 
-            viewsArray.add(binding.mainContainer.getChildAt(i));
+            viewsArray.add((ViewGroup) binding.mainContainer.getChildAt(i));
         }
 
         initViews();
@@ -154,9 +166,9 @@ public class SwipeView extends ViewPager {
         view.setAlpha(1);
     }
 
-    private ArrayList<View> sortViews(ArrayList<View> viewsArray) {
+    private ArrayList<ViewGroup> sortViews(ArrayList<ViewGroup> viewsArray) {
 
-        View tempView = viewsArray.get(0);
+        ViewGroup tempView = viewsArray.get(0);
 
         for (int i = 0; i < size - 1; i++) {
 
@@ -323,5 +335,26 @@ public class SwipeView extends ViewPager {
                         .setInterpolator(null);
             }
         }
+    }
+
+    public void setAdapter(SwipeViewAdapter adapter) {
+
+        this.adapter = adapter;
+
+        int size = viewsArray.size();
+
+        for (int i = 0; i < size; i++) {
+
+            viewsArray.get(i).addView((View) adapter.getView(i));
+        }
+    }
+
+    public void setListener(SwipeViewInterface listener) {
+        this.listener = listener;
+    }
+
+    public interface SwipeViewInterface {
+
+        void onElementSwiped();
     }
 }
