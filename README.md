@@ -1,4 +1,4 @@
-# swipe-test
+# swipe-view
 A simple swipeable view stack
 
 ```
